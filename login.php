@@ -16,10 +16,10 @@ if ($user && password_verify($password, $user['password']))
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['role'] = $user['role'];
     $_SESSION['is_blocked'] = $user['is_blocked'];
+    setcookie('role', $user['role']);
     header("Location: chat.html");
 } 
 else 
 {
     echo "Invalid credentials";
 }
-?>

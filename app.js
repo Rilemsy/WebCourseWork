@@ -3,6 +3,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageInput = document.getElementById("message-input");
     const sendButton = document.getElementById("send-button");
 
+    var match = document.cookie.match(new RegExp('(?<=role\=)([a-zA-Z]+)'));
+    var role = decodeURIComponent(match[1]);
+    console.log(role)
+    if ( role == 'visitor')
+    {
+        button = document.getElementById("user-controls");
+        button.outerHTML = "<div id=\"user-controls\"\> <input type=\"text\" id=\"message-input\" placeholder=\"Type your message...\" disabled\> <button id=\"send-button\" disabled>Send</button\></div>"
+        //<button id=\"send-button\" disabled>Send</button>
+    }
+
+
     // Fetch messages from server
     fetch("fetch_messages.php")
         .then(response => response.json())

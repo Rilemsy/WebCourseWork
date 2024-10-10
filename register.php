@@ -17,15 +17,15 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) 
 {
     // Username already exists
-    echo "Username already taken.";// <a href='register.html'>Try a different one</a>";
+    echo "Username already taken. <a href='register.html'>Try a different one</a>";
 } 
 
 else 
 {
     // Insert new user into the database
-    $stmt = $conn->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+    $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, 'user')");
     $stmt->bind_param("ss", $username, $hashedPassword);
     $stmt->execute();
 
-    echo "Registration successful!";// <a href='login.html'>Login</a>";
+    echo "Registration successful! <a href='login.html'>Login</a>";
 }
