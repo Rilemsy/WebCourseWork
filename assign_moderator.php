@@ -12,4 +12,3 @@ $username = $data['username'];
 $stmt = $conn->prepare("UPDATE users SET role = 'moderator' WHERE username = ?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
-?>
