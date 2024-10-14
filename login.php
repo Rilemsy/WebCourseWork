@@ -17,7 +17,20 @@ if ($user && password_verify($password, $user['password']))
     $_SESSION['role'] = $user['role'];
     $_SESSION['is_blocked'] = $user['is_blocked'];
     setcookie('role', $user['role']);
-    header("Location: chat.html");
+    switch($user['role'])
+    {
+        case 'user': 
+            header("Location: chat_user.html");
+            break;
+        case 'moderator': 
+            header("Location: chat_moderator.html");
+            break;
+        case 'admin': 
+            header("Location: chat_admin.html");
+            break;
+        default:
+            header("Location: chat.html");
+    }
 } 
 else 
 {
