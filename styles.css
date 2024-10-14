@@ -48,7 +48,6 @@ body {
 
 #admin-controls {
     /* margin-top: 20px; */
-    display:none;
     position: absolute;
     top: 20%;
     left: 70%;
@@ -64,7 +63,6 @@ body {
 
 #moderator-controls {
     /* margin-top: 20px; */
-    /* display:none; */
     position: absolute;
     top: 20%;
     left: 70%;

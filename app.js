@@ -1,7 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
     const messageContainer = document.getElementById("message-container");
-    const messageInput = document.getElementById("message-input");
-    const sendButton = document.getElementById("send-button");
 
     match = document.cookie.match(new RegExp('(?<=role\=)([a-zA-Z]+)'));
     role = null
@@ -13,19 +11,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if ( role && role == 'user')
     {
-        button = document.getElementById("user-controls");
-        button.outerHTML = "<div id=\"user-controls\"\> <input type=\"text\" id=\"message-input\" placeholder=\"Type your message...\"\> <button id=\"send-button\">Send</button\></div>"
+        //userControls = document.getElementById("user-controls");
+        messageContainer.insertAdjacentHTML('afterend',
+		`
+		<div id=\"user-controls\"\> 
+			<input type=\"text\" id=\"message-input\" placeholder=\"Type your message...\"\> 
+			<button id=\"send-button\">Send</button\>
+		</div>
+		`)
+		//userControls.outerHTML = "<div id=\"user-controls\"\> <input type=\"text\" id=\"message-input\" placeholder=\"Type your message...\"\> <button id=\"send-button\">Send</button\></div>"
         //<button id=\"send-button\" disabled>Send</button>
     }
 
+	const messageInput = document.getElementById("message-input");
+    const sendButton = document.getElementById("send-button");
+
+	const chatContainer = document.getElementById("chat-container");
     if (role && role == 'moderator')
     {
-        const chatContainer = document.getElementById("chat-container");
-        chatContainer.insertAdjacentHTML('afterend',
+        chatContainer.insertAdjacentElement('afterend',
         `
         <div id="moderator-controls">
             <h4>Moderator Controls</h4>
-            <input type="text" id="moderator-username" placeholder="Enter username">
+            <input type="text" id="user-name" placeholder="Enter username">
             <br></br>
             <button id="block-button">Block</button>
         </div>
@@ -33,13 +41,23 @@ document.addEventListener("DOMContentLoaded", () => {
         )
     }
 
-    // const blockButton = (role = 'moderator') ? document.getElementById("block-button") : null;
+    const blockButton = (role && role == 'moderator') ? document.getElementById("block-button") : null;
 
     if (role && role == 'admin')
     {
         console.log("check admin controls")
-        document.getElementById("admin-controls").style.display = "block";
+        //document.getElementById("admin-controls").style.display = "block";
         //adminControls.style.display = "block"
+		chatContainer.insertAdjacentHTML('afterend',
+			`
+			<div id="admin-controls">
+				<h4>Admin Controls</h4>
+				<input type="text" id="moderator-username" placeholder="Enter username">
+				<br></br>
+				<button id="assign-button">Assign Moderator</button>
+			</div>
+			`
+		)
     }
 
     console.log("Next")
@@ -70,55 +88,64 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
     // Send message to server
-    sendButton.addEventListener("click", () => {
+	if (sendButton)
+	{
+		sendButton.addEventListener("click", () => {
         const message = messageInput.value;
-        if (message.trim() !== "") {
-            fetch("send_message.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ message }),
-            }).then(response => response.text()).then(data => {
-                // Refresh messages
-                location.reload();
-            });
-        }
-    });
+			if (message.trim() !== "") {
+					fetch("send_message.php", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ message }),
+					}).then(response => response.text()).then(data => {
+					// Refresh messages
+					location.reload();
+				});
+			}
+		});
+	}
 
-    assignButton.addEventListener("click", () => {
-        const username = moderatorUsernameInput.value;
-        if (username.trim() !== "") {
-            fetch("assign_moderator.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ username }),
-            }).then(response => response.text()).then(data => {
-                // Refresh messages
-                //location.reload();
-                //console.log(response)
-                console.log(data)
-                moderatorUsernameInput.value = ''
-            });
-        }
-    });
 
-    blockButton.addEventListener("click", () => {
-        const message = messageInput.value;
-        if (message.trim() !== "") {
-            fetch("send_message.php", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ message }),
-            }).then(response => response.text()).then(data => {
-                // Refresh messages
-                location.reload();
-            });
-        }
-    });
+	if (assignButton)
+	{
+		assignButton.addEventListener("click", () => {
+			const username = moderatorUsernameInput.value;
+			if (username.trim() !== "") {
+					fetch("assign_moderator.php", {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ username }),
+					}).then(response => response.text()).then(data => {
+					// Refresh messages
+					//location.reload();
+					//console.log(response)
+					console.log(data)
+					moderatorUsernameInput.value = ''
+					});
+			}
+		});
+	}
 
+	if (blockButton)
+	{
+		blockButton.addEventListener("click", () => {
+			const message = messageInput.value;
+			if (message.trim() !== "") {
+				fetch("send_message.php", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ message }),
+				}).then(response => response.text()).then(data => {
+					// Refresh messages
+					location.reload();
+					});
+			}
+		});
+	}
 });
