@@ -20,16 +20,16 @@ if ($user && password_verify($password, $user['password']))
     switch($user['role'])
     {
         case 'user': 
-            header("Location: chat_user.html");
+            header("Location: user.html");
             break;
         case 'moderator': 
-            header("Location: chat_moderator.html");
+            header("Location: moderator.html");
             break;
         case 'admin': 
-            header("Location: chat_admin.html");
+            header("Location: admin.html");
             break;
         default:
-            header("Location: chat.html");
+            header("Location: guest.html");
     }
 } 
 else 

@@ -27,6 +27,28 @@
         <button id="block-button">Block</button>
     </div>
 
-    <script src="app.js"></script>
+    <script defer src = "fetch_messages.js"></script>
+    <script defer src="user.js"></script>
+    <script defer>
+        const blockButton = document.getElementById("block-button");
+        if (blockButton)
+        {
+            blockButton.addEventListener("click", () => {
+                const message = messageInput.value;
+                if (message.trim() !== "") {
+                    fetch("send_message.php", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ message }),
+                    }).then(response => response.text()).then(data => {
+                        // Refresh messages
+                        location.reload();
+                        });
+                }
+            });
+        }
+    </script>
 </body>
 </html>

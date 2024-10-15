@@ -27,6 +27,34 @@
         <button id="assign-button">Assign Moderator</button>
     </div>
 
-    <script src="app.js"></script>
+    <script defer src = "fetch_messages.js"></script>
+    <script defer src="user.js"></script>
+    <script defer>
+        console.log("Admin")
+        const assignButton = document.getElementById("assign-button");
+        const moderatorUsernameInput = document.getElementById("moderator-username");
+
+        if (assignButton)
+	    {
+            assignButton.addEventListener("click", () => {
+                const username = moderatorUsernameInput.value;
+                if (username.trim() !== "") {
+                        fetch("assign_moderator.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ username }),
+                        }).then(response => response.text()).then(data => {
+                        // Refresh messages
+                        //location.reload();
+                        //console.log(response)
+                        console.log(data)
+                        moderatorUsernameInput.value = ''
+                        });
+                }
+            });
+	    }
+    </script>
 </body>
 </html>
