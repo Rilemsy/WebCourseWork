@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php';
+require 'dbconnect.php';
 
 if ($_SESSION['role'] != 'admin') {
     die("Access denied.");
@@ -8,7 +8,17 @@ if ($_SESSION['role'] != 'admin') {
 
 $data = json_decode(file_get_contents('php://input'), true);
 $username = $data['username'];
-
-$stmt = $conn->prepare("UPDATE users SET role = 'moderator' WHERE username = ?");
-$stmt->bind_param("s", $username);
+$role = "user";
+$stmt = $conn->prepare("UPDATE users SET role = 'moderator' WHERE username = ? AND role = ?");
+$stmt->bind_param("ss", $username, $role);
 $stmt->execute();
+
+if(!$stmt->execute()){
+    die("Error". $stmt->error);
+}
+if($stmt->affected_rows == 1){
+    echo json_encode("$username was assigned to be moderator successfully.");
+}
+else{
+    echo json_encode("Failed to assigned $username to be moderator.");
+}

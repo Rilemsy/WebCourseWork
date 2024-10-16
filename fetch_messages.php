@@ -1,5 +1,5 @@
 <?php
-require 'db.php';  // Connection to the database
+require 'dbconnect.php';  // Connection to the database
 
 $query = "SELECT messages.timestamp ,users.username, messages.message 
           FROM messages 

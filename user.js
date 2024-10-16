@@ -1,8 +1,7 @@
 console.log("User")
 const sendButton = document.getElementById("send-button");
 const messageInput = document.getElementById("message-input");
-        if (sendButton)
-        {
+        if (sendButton) {
             sendButton.addEventListener("click", () => {
             const message = messageInput.value;
                 if (message.trim() !== "") {
@@ -13,8 +12,14 @@ const messageInput = document.getElementById("message-input");
                             },
                             body: JSON.stringify({ message }),
                         }).then(response => response.text()).then(data => {
-                        // Refresh messages
-                        location.reload();
+                        
+                        if (data) {
+                            messageInput.value = ''
+                            alert(data)
+                        }
+                        else {
+                            location.reload();
+                        }
                     });
                 }
             });

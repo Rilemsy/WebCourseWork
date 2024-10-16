@@ -22,7 +22,7 @@
 
     <div id="moderator-controls">
         <h4>Moderator Controls</h4>
-        <input type="text" id="user-name" placeholder="Enter username">
+        <input type="text" id="username-input" placeholder="Enter username">
         <br></br>
         <button id="block-button">Block</button>
     </div>
@@ -31,20 +31,22 @@
     <script defer src="user.js"></script>
     <script defer>
         const blockButton = document.getElementById("block-button");
+        const usernameInput = document.getElementById("username-input");
+
         if (blockButton)
         {
             blockButton.addEventListener("click", () => {
-                const message = messageInput.value;
-                if (message.trim() !== "") {
-                    fetch("send_message.php", {
+                const username = usernameInput.value;
+                if (username.trim() !== "") {
+                    fetch("block_user.php", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({ message }),
+                        body: JSON.stringify({ username }),
                     }).then(response => response.text()).then(data => {
-                        // Refresh messages
-                        location.reload();
+                        usernameInput.value = ''
+                        alert(data);
                         });
                 }
             });

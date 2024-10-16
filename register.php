@@ -1,5 +1,5 @@
 <?php
-require 'db.php';  // Database connection
+require 'dbconnect.php';  // Database connection
 
 // Get user input
 $username = $_POST['username'];
