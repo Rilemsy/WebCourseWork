@@ -9,7 +9,13 @@
   </head>
   <body>
     <div class="container">
-      <h1>Чат</h1>
+      <header>
+        <h1>Чат</h1>
+        <div class="user-info">
+          <span id="user-name-role"></span>
+          <button id="auth-button" class="hidden">Войти</button>
+        </div>
+      </header>
 
       <div class="chat-wrapper">
         <!-- Основная часть: сообщения и форма -->
@@ -68,83 +74,6 @@
       </li>
     </template>
 
-    <script>
-      // Пример данных
-      const messages = [
-        {
-          date: '01.12.2024 14:30',
-          username: 'Иван Иванов',
-          role: 'Администратор',
-          text: 'Добро пожаловать в наш чат!',
-        },
-        {
-          date: '01.12.2024 14:32',
-          username: 'Анна Смирнова',
-          role: 'Пользователь',
-          text: 'Спасибо! Рада быть здесь.',
-        },
-        {
-          date: '01.12.2024 14:30',
-          username: 'Иван Иванов',
-          role: 'Администратор',
-          text: 'Добро пожаловать в наш чат!',
-        },
-        {
-          date: '01.12.2024 14:32',
-          username: 'Анна Смирнова',
-          role: 'Пользователь',
-          text: 'Спасибо! Рада быть здесь.',
-        },
-        {
-          date: '01.12.2024 14:30',
-          username: 'Иван Иванов',
-          role: 'Администратор',
-          text: 'Добро пожаловать в наш чат!',
-        },
-        {
-          date: '01.12.2024 14:32',
-          username: 'Анна Смирнова',
-          role: 'Пользователь',
-          text: 'Спасибо! Рада быть здесь.',
-        },
-      ];
-
-      const users = [
-        { name: 'Иван Иванов', role: 'Администратор' },
-        { name: 'Петр Петров', role: 'Модератор' },
-        { name: 'Анна Смирнова', role: 'Пользователь' },
-        { name: 'Иван Иванов', role: 'Администратор' },
-        { name: 'Петр Петров', role: 'Модератор' },
-        { name: 'Анна Смирнова', role: 'Пользователь' },
-        { name: 'Иван Иванов', role: 'Администратор' },
-        { name: 'Петр Петров', role: 'Модератор' },
-        { name: 'Анна Смирнова', role: 'Пользователь' },
-        { name: 'Иван Иванов', role: 'Администратор' },
-        { name: 'Петр Петров', role: 'Модератор' },
-        { name: 'Анна Смирнова', role: 'Пользователь' },
-      ];
-
-      // Рендеринг сообщений
-      const messageList = document.getElementById('message-list');
-      const messageTemplate = document.getElementById('message-template');
-      messages.forEach(msg => {
-        const clone = messageTemplate.content.cloneNode(true);
-        clone.querySelector('.message-date').textContent = msg.date;
-        clone.querySelector('.message-username').textContent = msg.username + ':';
-        clone.querySelector('.message-role').textContent = msg.role;
-        clone.querySelector('.message-text').textContent = msg.text;
-        messageList.appendChild(clone);
-      });
-
-      // Рендеринг пользователей
-      const userList = document.getElementById('user-list');
-      const userTemplate = document.getElementById('user-template');
-      users.forEach(user => {
-        const clone = userTemplate.content.cloneNode(true);
-        clone.querySelector('.user-name').textContent = user.name;
-        clone.querySelector('.user-role').textContent = user.role;
-        userList.appendChild(clone);
-      });
-    </script>
+    <script src="js/chat.js"></script>
   </body>
 </html>
