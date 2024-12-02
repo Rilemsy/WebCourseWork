@@ -6,7 +6,6 @@ CREATE TABLE roles (
 
 -- Заполнение ролей
 INSERT INTO roles (name) VALUES 
-('guest'), 
 ('user'), 
 ('moderator'), 
 ('admin');

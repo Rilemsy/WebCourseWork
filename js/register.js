@@ -39,16 +39,21 @@ document.addEventListener('DOMContentLoaded', () => {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({ username, password }),
     })
-      .then(response => response.json())
+      .then(response => response.text()) // Use .text() to see the raw response
       .then(data => {
-        if (data.success) {
+        console.log('Raw response:', data); // Log the raw response to debug
+        return JSON.parse(data); // Manually parse JSON
+      })
+      .then(parsedData => {
+        if (parsedData.success) {
           alert('Registration successful!');
           window.location.href = 'login.html';
         } else {
-          errorMessage.textContent = data.message || 'Registration failed.';
+          errorMessage.textContent = parsedData.message || 'Registration failed.';
         }
       })
       .catch(err => {
+        console.error('Error:', err); // Log the error to debug
         errorMessage.textContent =
           err.message || 'An error occurred. Please try again.';
       });
