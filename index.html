@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register</title>
+    <title>Login</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/form.css" />
   </head>
@@ -41,34 +41,20 @@
           </button>
         </div>
 
-        <label for="confirm-password" title="Enter your password" class="mb-1"
-          >Сonfirm password:</label
-        >
-        <div class="password-wrapper mb-4">
-          <input
-            type="password"
-            id="confirm-password"
-            name="confirm-password"
-            required
-            placeholder="Сonfirm your password"
-            title="Сonfirm your password"
-          />
-          <button
-            type="button"
-            id="toggle-confirm-password"
-            class="toggle-password"
-          >
-            Show
-          </button>
-        </div>
-
         <span id="error-message" class="error-message mb-2"></span>
 
         <button type="submit" title="Register your account">Register</button>
       </form>
-      <p>Already have an account? <a href="login.html">Login</a></p>
+      <p>
+        Don't have an account?
+        <a href="register.html" title="Register a new account">Register</a>
+      </p>
+      <p>
+        Enter as guest
+        <a href="chat.html" title="Access the platform as a guest">Enter</a>
+      </p>
     </div>
 
-    <script src="js/register.js"></script>
+    <script src="js/login.js"></script>
   </body>
 </html>
