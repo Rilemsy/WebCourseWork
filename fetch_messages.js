@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(response => response.json())
             .then(data => {
                 //console.log("2 fetch")
-    
+                messageContainer.textContent = ''
                 data.forEach(message => {
                     const msgDiv = document.createElement("div");
                     msgDiv.classList.add("message");
