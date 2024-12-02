@@ -26,5 +26,20 @@ CREATE TABLE messages (
     user_id INT NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_edited BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
+
+-- Добавление пользователей
+INSERT INTO users (username, password_hash, role_id, is_blocked) VALUES
+('user1', '$2y$10$eImiTXuWVxfM37uY4JANjQWv.Pw5J5QuZM7f0/6FGEQRuCwA.KK2.', 1, FALSE), -- Пароль: password1
+('mod1', '$2y$10$eImiTXuWVxfM37uY4JANjQWv.Pw5J5QuZM7f0/6FGEQRuCwA.KK2.', 2, FALSE), -- Пароль: password1
+('admin1', '$2y$10$eImiTXuWVxfM37uY4JANjQWv.Pw5J5QuZM7f0/6FGEQRuCwA.KK2.', 3, FALSE), -- Пароль: password1
+('blocked_user', '$2y$10$eImiTXuWVxfM37uY4JANjQWv.Pw5J5QuZM7f0/6FGEQRuCwA.KK2.', 1, TRUE); -- Заблокированный пользователь
+
+-- Добавление сообщений
+INSERT INTO messages (user_id, content, is_edited) VALUES
+(1, 'Привет! Это сообщение от пользователя user1.', FALSE),
+(2, 'Добро пожаловать в чат. Это сообщение от модератора.', FALSE),
+(3, 'Приветствую всех! Это сообщение от администратора.', FALSE),
+(1, 'Я только что отредактировал это сообщение.', TRUE);
