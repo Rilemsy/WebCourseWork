@@ -25,11 +25,7 @@ if (isset($_SESSION['user_id'])) {
 
             echo json_encode([
                 'success' => true,
-                'data' => [
-                    'id' => $user['id'],
-                    'username' => $user['username'],
-                    'role' => $user['role'],
-                ]
+                'data' => $user
             ]);
         } else {
             echo json_encode(['success' => false, 'message' => 'User not found']);

@@ -3,14 +3,13 @@ require_once '../db.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($data['messageId'], $data['content'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($data['messageId'])) {
     $messageId = intval($data['messageId']);
-    $content = $data['content'];
 
     try {
         $db = connectDB();
-        $stmt = $db->prepare("UPDATE messages SET content = :content, is_edited = TRUE WHERE id = :messageId");
-        $stmt->execute(['content' => $content, 'messageId' => $messageId]);
+        $stmt = $db->prepare("DELETE FROM messages WHERE id = :messageId");
+        $stmt->execute(['messageId' => $messageId]);
 
         echo json_encode(['success' => true]);
     } catch (Exception $e) {

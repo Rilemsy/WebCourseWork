@@ -52,6 +52,56 @@
       </div>
     </div>
 
+    <!-- Универсальное модальное окно -->
+    <div id="action-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="action-modal-title">Выберите действие</h2>
+        <div id="action-buttons" class="modal-buttons">
+          <!-- Динамически добавляемые кнопки действий -->
+        </div>
+        <button id="cancel-action" class="btn-secondary">Закрыть</button>
+      </div>
+    </div>
+
+    <!-- Редактировать сообщение -->
+    <div
+      id="edit-message-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-labelledby="edit-message-title"
+    >
+      <div class="modal-content">
+        <h2 id="edit-message-title">Редактировать сообщение</h2>
+        <label for="edit-message-text">Введите текст сообщения:</label>
+        <textarea
+          id="edit-message-text"
+          placeholder="Введите текст сообщения"
+        ></textarea>
+        <button id="save-message" class="btn-primary">Сохранить</button>
+        <button id="cancel-edit" class="btn-secondary">Отмена</button>
+      </div>
+    </div>
+
+    <!-- Изменение роли -->
+    <div
+      id="change-role-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-labelledby="change-role-title"
+    >
+      <div class="modal-content">
+        <h2 id="change-role-title">Изменить роль</h2>
+        <label for="new-role">Выберите новую роль:</label>
+        <select id="new-role" aria-label="Выбор роли">
+          <option value="user">Пользователь</option>
+          <option value="moderator">Модератор</option>
+          <option value="admin">Администратор</option>
+        </select>
+        <button id="save-role" class="btn-primary">Сохранить</button>
+        <button id="cancel-role" class="btn-secondary">Отмена</button>
+      </div>
+    </div>
+
     <!-- Шаблон карточки сообщения -->
     <template id="message-template">
       <li class="message-card">

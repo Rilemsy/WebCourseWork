@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .getElementById('message-template')
             .content.cloneNode(true);
           clone.querySelector('.message-card').dataset.id = msg.id;
-          clone.querySelector('.message-card').dataset.userId = msg.userId;
+          clone.querySelector('.message-card').dataset.userId = msg.user_id;
+          clone.querySelector('.message-card').dataset.userRole = msg.role;
           clone.querySelector('.message-date').textContent = msg.created_at;
           clone.querySelector('.message-username').textContent =
             msg.username + ':';
@@ -46,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .getElementById('user-template')
             .content.cloneNode(true);
           clone.querySelector('.user-card').dataset.id = user.id;
+          clone.querySelector('.user-card').dataset.role = user.role;
           if (user.is_blocked == 1) {
             clone.querySelector('.user-card').classList.add('block');
           }
@@ -86,51 +88,143 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   });
 
-  //// ПКМ на сообщении
-  //document.addEventListener('contextmenu', e => {
-  //  const messageCard = e.target.closest('.message-card');
-  //  if (!messageCard) return;
+  // ПКМ на сообщении
+  document.addEventListener('contextmenu', e => {
+    const messageCard = e.target.closest('.message-card');
+    const userCard = e.target.closest('.user-card');
+    const userInfo = document.getElementById('user-name-role');
 
-  //  e.preventDefault();
-  //  const messageId = messageCard.dataset.id;
+    if (!messageCard && !userCard) return;
 
-  //  if (messageCard.dataset.isAuthor === 'true') {
-  //    // Редактирование сообщения
-  //    showEditMessageModal(messageId, messageCard);
-  //  }
+    e.preventDefault();
 
-  //  if (currentUserRole === 'moderator' || currentUserRole === 'admin') {
-  //    const userId = messageCard.dataset.userId;
-  //    showUserOptions(userId);
-  //  }
-  //});
+    const currentUserRole = userInfo.dataset.role;
+    const userId = userInfo.dataset.id;
 
-  // Редактирование сообщения
+    if (messageCard) {
+      const messageId = messageCard.dataset.id;
+      const messageUserId = messageCard.dataset.userId;
+      const messageUserRole = messageCard.dataset.userRole;
+
+      showActionModal(
+        'message',
+        { messageId, messageUserId, messageUserRole },
+        currentUserRole,
+        userId,
+      );
+    }
+
+    if (userCard) {
+      const targetUserId = userCard.dataset.id;
+      const targetUserRole = userCard.dataset.role;
+
+      showActionModal(
+        'user',
+        { targetUserId, targetUserRole },
+        currentUserRole,
+        userId,
+      );
+    }
+  });
+
+  function showActionModal(type, data, currentUserRole, currentUserId) {
+    const modal = document.getElementById('action-modal');
+    const buttonsContainer = document.getElementById('action-buttons');
+    buttonsContainer.innerHTML = ''; // Очистить старые кнопки
+
+    if (type === 'message') {
+      const { messageId, messageUserId, messageUserRole } = data;
+
+      // Редактировать (только автор)
+      if (messageUserId === currentUserId) {
+        addActionButton('Редактировать', () => {
+          showEditMessageModal(messageId);
+        });
+      }
+
+      // Удалить (автор, модератор, администратор)
+      if (
+        messageUserId === currentUserId ||
+        (currentUserRole === 'moderator' && messageUserRole === 'user') ||
+        (currentUserRole === 'admin' && messageUserRole !== 'admin')
+      ) {
+        addActionButton('Удалить', () => {
+          deleteMessage(messageId);
+        });
+      }
+
+      // Заблокировать пользователя (модератор, администратор)
+      if (
+        ((currentUserRole === 'moderator' && messageUserRole === 'user') ||
+          (currentUserRole === 'admin' && messageUserRole !== 'admin')) &&
+        messageUserId !== currentUserId
+      ) {
+        addActionButton('Заблокировать/Разблокировать пользователя', () => {
+          blockOrUnblockUser(messageUserId);
+        });
+      }
+
+      // Изменить роль (администратор, если не администратор)
+      if (currentUserRole === 'admin' && messageUserRole !== 'admin') {
+        addActionButton('Изменить роль', () => {
+          showChangeRoleModal(messageUserId);
+        });
+      }
+    }
+
+    if (type === 'user') {
+      const { targetUserId, targetUserRole } = data;
+
+      // Изменить роль (администратор, если не администратор)
+      if (currentUserRole === 'admin' && targetUserRole !== 'admin') {
+        addActionButton('Изменить роль', () => {
+          showChangeRoleModal(targetUserId);
+        });
+      }
+
+      // Заблокировать пользователя (модератор, администратор, если ниже рангом)
+      if (
+        ((currentUserRole === 'moderator' && targetUserRole === 'user') ||
+          (currentUserRole === 'admin' && targetUserRole !== 'admin')) &&
+        targetUserId !== currentUserId
+      ) {
+        addActionButton('Заблокировать пользователя', () => {
+          blockOrUnblockUser(targetUserId);
+        });
+      }
+    }
+
+    modal.classList.remove('hidden');
+
+    // Закрыть окно
+    document.getElementById('cancel-action').onclick = () => {
+      modal.classList.add('hidden');
+    };
+  }
+
+  function addActionButton(label, onClick) {
+    const button = document.createElement('button');
+    button.textContent = label;
+    button.className = 'btn-primary';
+    button.onclick = () => {
+      onClick();
+      document.getElementById('action-modal').classList.add('hidden');
+    };
+    document.getElementById('action-buttons').appendChild(button);
+  }
+
   function showEditMessageModal(messageId, messageCard) {
     const modal = document.getElementById('edit-message-modal');
-    const textarea = modal.querySelector('#edit-message-text');
-    textarea.value = messageCard.querySelector('.message-text').textContent;
+    const textarea = document.getElementById('edit-message-text');
+    textarea.value = messageCard.querySelector('.message-content').textContent;
+
     modal.classList.remove('hidden');
 
     document.getElementById('save-message').onclick = () => {
-      const newText = textarea.value.trim();
-      if (!newText) return;
-
-      fetch('php/chat/editMessage.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ id: messageId, content: newText }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            fetchMessages();
-            modal.classList.add('hidden');
-          } else {
-            alert(data.message || 'Editing error.');
-          }
-        })
-        .catch(err => console.error('Error:', err));
+      // Реализация сохранения изменений сообщения
+      const newContent = textarea.value;
+      saveMessageChanges(messageId, newContent);
+      modal.classList.add('hidden');
     };
 
     document.getElementById('cancel-edit').onclick = () => {
@@ -138,65 +232,108 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Удаление сообщения
+  function showEditMessageModal(messageId) {
+    const modal = document.getElementById('edit-message-modal');
+    const textarea = document.getElementById('edit-message-text');
+    const saveButton = document.getElementById('save-message');
+
+    // Подгрузить текст сообщения
+    fetch(`php/chat/getMessage.php?messageId=${messageId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          textarea.value = data.message.content;
+          modal.classList.remove('hidden');
+        } else {
+          alert('The message could not be uploaded.');
+        }
+      })
+      .catch(err => console.error('Error loading the message:', err));
+
+    saveButton.onclick = () => {
+      fetch('php/chat/editMessage.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messageId, content: textarea.value }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('The message has been edited.');
+            modal.classList.add('hidden');
+          } else {
+            alert('Error editing the message.');
+          }
+        })
+        .catch(err => console.error('Error:', err));
+    };
+  }
+
   function deleteMessage(messageId) {
+    if (!confirm('Are you sure you want to delete this message?')) return;
+
     fetch('php/chat/deleteMessage.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ id: messageId }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messageId }),
     })
       .then(response => response.json())
       .then(data => {
-        if (data.success) fetchMessages();
-        else alert(data.message || 'Deletion error.');
+        if (data.success) {
+          alert('The message has been deleted.');
+        } else {
+          alert('Error deleting the message.');
+        }
       })
       .catch(err => console.error('Error:', err));
   }
 
-  // Блокировка пользователя
-  function blockUser(userId) {
-    fetch('php/chat/blockUser.php', {
+  function blockOrUnblockUser(userId) {
+    fetch(`php/chat/toggleBlockUser.php`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ id: userId }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
     })
       .then(response => response.json())
       .then(data => {
-        if (data.success) fetchUsers();
-        else alert(data.message || 'Blocking error.');
+        if (data.success) {
+          alert(
+            data.isBlocked
+              ? 'Error deleting the message.'
+              : 'The user is unblocked.',
+          );
+        } else {
+          alert('Error blocking the user.');
+        }
       })
       .catch(err => console.error('Error:', err));
   }
 
-  //// Изменение роли пользователя
-  //function showRoleModal(userId) {
-  //  const modal = document.getElementById('change-role-modal');
-  //  modal.classList.remove('hidden');
+  function showChangeRoleModal(userId) {
+    const modal = document.getElementById('change-role-modal');
+    const select = document.getElementById('new-role');
+    const saveButton = document.getElementById('save-role');
 
-  //  document.getElementById('save-role').onclick = () => {
-  //    const newRole = document.getElementById('new-role').value;
+    modal.classList.remove('hidden');
 
-  //    fetch('php/chat/changeRole.php', {
-  //      method: 'POST',
-  //      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  //      body: new URLSearchParams({ id: userId, role: newRole }),
-  //    })
-  //      .then(response => response.json())
-  //      .then(data => {
-  //        if (data.success) {
-  //          fetchUsers();
-  //          modal.classList.add('hidden');
-  //        } else {
-  //          alert(data.message || 'Error changing the role.');
-  //        }
-  //      })
-  //      .catch(err => console.error('Error:', err));
-  //  };
-
-  //  document.getElementById('cancel-role').onclick = () => {
-  //    modal.classList.add('hidden');
-  //  };
-  //}
+    saveButton.onclick = () => {
+      fetch('php/chat/changeRole.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, newRole: select.value }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('The role has been changed.');
+            modal.classList.add('hidden');
+          } else {
+            alert('Error changing the role.');
+          }
+        })
+        .catch(err => console.error('Error:', err));
+    };
+  }
 
   // Проверка авторизации пользователя
   function fetchUserInfo() {
@@ -214,6 +351,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.success) {
           const user = data.data;
           userInfo.textContent = `${user.username} (${user.role})`;
+          userInfo.dataset.id = user.id;
+          userInfo.dataset.role = user.role;
+          userInfo.dataset.is_blocked = user.is_blocked == 1;
           userInfo.classList.remove('hidden');
           authButton.classList.add('hidden');
 
