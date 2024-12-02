@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/form.css" />
+  </head>
+  <body>
+    <div class="form">
+      <h1>Login</h1>
+      <form id="login-form" aria-label="Login Form" class="mb-4">
+        <label for="username" title="Enter your username" class="mb-1"
+          >Username:</label
+        >
+        <input
+          type="text"
+          id="username"
+          name="username"
+          required
+          placeholder="Enter your username"
+          title="Enter your username"
+          class="mb-3"
+        />
+
+        <label for="password" title="Enter your password" class="mb-1"
+          >Password:</label
+        >
+        <div class="password-wrapper mb-3">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            placeholder="Enter your password"
+            title="Enter your password"
+          />
+          <button type="button" id="toggle-password" class="toggle-password">
+            Show
+          </button>
+        </div>
+
+        <span id="error-message" class="error-message mb-2"></span>
+
+        <button type="submit" title="Login your account">Login</button>
+      </form>
+      <p>
+        Don't have an account?
+        <a href="register.html" title="Register a new account">Register</a>
+      </p>
+      <p>
+        Enter as guest
+        <a href="chat.html" title="Access the platform as a guest">Enter</a>
+      </p>
+    </div>
+
+    <script src="js/login.js"></script>
+  </body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/chat.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Чат</h1>
+        <div class="user-info">
+          <span id="user-name-role"></span>
+          <button id="auth-button" class="hidden">Войти</button>
+        </div>
+      </header>
+
+      <div class="chat-wrapper">
+        <!-- Основная часть: сообщения и форма -->
+        <main class="chat-section">
+          <!-- Список сообщений -->
+          <section class="messages mb-4">
+            <h2 class="mb-3">Сообщения</h2>
+            <ul id="message-list" class="message-cards">
+              <!-- Сообщения добавляются через template -->
+            </ul>
+          </section>
+
+          <!-- Форма отправки сообщения -->
+          <section class="message-form">
+            <h2 class="mb-3">Отправить сообщение</h2>
+            <form id="message-form">
+              <textarea
+                name="message"
+                rows="4"
+                placeholder="Введите сообщение"
+              ></textarea>
+              <button type="submit">Отправить</button>
+            </form>
+          </section>
+        </main>
+
+        <!-- Список пользователей -->
+        <aside class="user-list mb-4">
+          <h2 class="mb-3">Пользователи</h2>
+          <ul id="user-list" class="user-cards">
+            <!-- Пользователи добавляются через template -->
+          </ul>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Шаблон карточки сообщения -->
+    <template id="message-template">
+      <li class="message-card">
+        <div class="message-header">
+          <span class="message-date"></span>
+          <div>
+            <span class="message-username"></span>
+            <span class="message-role"></span>
+          </div>
+        </div>
+        <p class="message-text"></p>
+      </li>
+    </template>
+
+    <!-- Шаблон карточки пользователя -->
+    <template id="user-template">
+      <li class="user-card">
+        <span class="user-role"></span>
+        <h3 class="user-name"></h3>
+      </li>
+    </template>
+
+    <script src="js/chat.js"></script>
+  </body>
+</html>
