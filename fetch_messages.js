@@ -38,11 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     messageContainer.appendChild(msgDiv);
                 });
     
-                messageContainer.scrollTop = messageContainer.scrollHeight;
+                //messageContainer.scrollTop = messageContainer.scrollHeight;
             });
     };
     
     fetchMessages()
+    setInterval(fetchMessages, 3000);
 
     const deleteMessage = (messageId) => {
         if (confirm("Are you sure you want to delete this message?")) {
@@ -75,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
         }
     };
-
 });
 
 
