@@ -3,6 +3,34 @@ import API from './api.js';
 document.addEventListener('DOMContentLoaded', () => {
   const timeUpdate = 5 * 1000;
 
+  function translateRole(role) {
+    const roles = {
+      user: 'Пользователь',
+      moderator: 'Модератор',
+      admin: 'Администратор',
+    };
+
+    return roles[role] || 'Пользователь';
+  }
+
+  function formatDateTime(isoString) {
+    const date = new Date(isoString);
+
+    // Форматирование: DD.MM.YYYY HH:mm
+    const formattedDate = date.toLocaleDateString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+
+    const formattedTime = date.toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    return `${formattedDate} ${formattedTime}`;
+  }
+
   // Функция для обновления списка сообщений
   function fetchMessages() {
     API.getMessages().then(data => {
@@ -16,10 +44,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const messageCard = clone.querySelector('.message-card');
         messageCard.dataset.id = msg.id;
-        messageCard.querySelector('.message-date').textContent = msg.created_at;
+        messageCard.querySelector('.message-date').textContent = formatDateTime(
+          msg.created_at,
+        );
         messageCard.querySelector('.message-username').textContent =
           msg.username + ':';
-        messageCard.querySelector('.message-role').textContent = msg.role;
+        messageCard.querySelector('.message-role').textContent = translateRole(
+          msg.role,
+        );
         messageCard.querySelector('.message-text').textContent = msg.content;
         if (msg.is_edited == 1) {
           messageCard.querySelector('.message-date').textContent +=
@@ -52,7 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
           userCard.classList.add('block');
         }
         userCard.querySelector('.user-name').textContent = user.username;
-        userCard.querySelector('.user-role').textContent = user.role;
+        userCard.querySelector('.user-role').textContent = translateRole(
+          user.role,
+        );
 
         userCard.dataset.id = user.id;
         userCard.dataset.role = user.role;
