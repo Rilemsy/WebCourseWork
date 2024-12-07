@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     API.register(username, password).then(data => {
-      if (parsedData.success) {
+      if (data.success) {
         window.location.href = 'chat.html';
       } else {
         errorMessage.textContent = 'Не удалось выполнить регистрацию.';
