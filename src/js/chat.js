@@ -16,14 +16,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatDateTime(isoString) {
     const date = new Date(isoString);
 
+    // Временная зона пользователя (в минутах)
+    const userTimezoneOffset = date.getTimezoneOffset(); // От UTC в минутах
+    const localDate = new Date(date.getTime() - userTimezoneOffset * 60000); // Корректируем время
+
     // Форматирование: DD.MM.YYYY HH:mm
-    const formattedDate = date.toLocaleDateString('ru-RU', {
+    const formattedDate = localDate.toLocaleDateString('ru-RU', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
     });
 
-    const formattedTime = date.toLocaleTimeString('ru-RU', {
+    const formattedTime = localDate.toLocaleTimeString('ru-RU', {
       hour: '2-digit',
       minute: '2-digit',
     });
@@ -276,6 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
       API.editMessage(messageId, textarea.value).then(data => {
         if (data.success) {
           modal.classList.add('hidden');
+          fetchMessages();
         }
       });
     };
