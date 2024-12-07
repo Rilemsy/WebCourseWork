@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success) {
         const user = data.data;
-        userName.textContent = `${user.username} (${user.role})`;
+        userName.textContent = `${user.username} (${translateRole(user.role)})`;
         userName.classList.remove('hidden');
         authButton.classList.add('hidden');
 
@@ -374,7 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
         userInfo.dataset.role = user.role;
         userInfo.dataset.is_blocked = user.is_blocked == 1;
 
-        // Enable message form
         messageTextarea.disabled = false;
         messageSubmitButton.disabled = false;
       } else {
@@ -386,7 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
           window.location.href = 'index.html';
         };
 
-        // Disable message form
         messageTextarea.disabled = true;
         messageSubmitButton.disabled = true;
       }
