@@ -1,3 +1,5 @@
+import API from './api.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   const registerForm = document.getElementById('register-form');
   const passwordField = document.getElementById('password');
@@ -34,27 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    fetch('php/auth/register.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ username, password }),
-    })
-      .then(response => response.text())
-      .then(data => {
-        console.log('Raw response:', data);
-        return JSON.parse(data);
-      })
-      .then(parsedData => {
-        if (parsedData.success) {
-          window.location.href = 'chat.html';
-        } else {
-          errorMessage.textContent = parsedData.message || 'Registration failed.';
-        }
-      })
-      .catch(err => {
-        console.error('Error:', err);
-        errorMessage.textContent =
-          err.message || 'An error occurred. Please try again.';
-      });
+    API.register(username, password).then(data => {
+      if (parsedData.success) {
+        window.location.href = 'chat.html';
+      } else {
+        errorMessage.textContent = parsedData.message || 'Registration failed.';
+      }
+    });
   });
 });

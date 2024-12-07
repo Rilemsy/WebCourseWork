@@ -1,3 +1,5 @@
+import API from './api.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
   const passwordField = document.getElementById('password');
@@ -20,24 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const username = document.getElementById('username').value.trim();
     const password = passwordField.value.trim();
 
-    fetch('php/auth/login.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ username, password }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('Registration successful!');
-          window.location.href = 'chat.html';
-        } else {
-          errorMessage.textContent = data.message || 'Login failed.';
-        }
-      })
-      .catch(err => {
-        console.error('Error:', err);
-        errorMessage.textContent =
-          err.message || 'An error occurred. Please try again.';
-      });
+    API.login(username, password).then(data => {
+      if (data.success) {
+        window.location.href = 'chat.html';
+      } else {
+        errorMessage.textContent = data.message || 'Login failed.';
+      }
+    });
   });
 });
