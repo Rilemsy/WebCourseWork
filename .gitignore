@@ -1,4 +1,5 @@
 phpmyadmin
 logs
 index
-.*
+.env
+.gitattributes
