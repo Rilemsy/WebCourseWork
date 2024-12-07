@@ -1,62 +1,54 @@
+import API from './api.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   const timeUpdate = 5 * 1000;
 
   // Функция для обновления списка сообщений
   function fetchMessages() {
-    fetch('php/chat/getMessages.php')
-      .then(response => response.json())
-      .then(data => {
-        const messageList = document.getElementById('message-list');
-        messageList.innerHTML = ''; // Очищаем старые сообщения
+    API.getMessages().then(data => {
+      const messageList = document.getElementById('message-list');
+      messageList.innerHTML = '';
 
-        data.data.forEach(msg => {
-          const clone = document
-            .getElementById('message-template')
-            .content.cloneNode(true);
-          clone.querySelector('.message-card').dataset.id = msg.id;
-          clone.querySelector('.message-card').dataset.userId = msg.user_id;
-          clone.querySelector('.message-card').dataset.userRole = msg.role;
-          clone.querySelector('.message-date').textContent = msg.created_at;
-          clone.querySelector('.message-username').textContent =
-            msg.username + ':';
-          clone.querySelector('.message-role').textContent = msg.role;
-          clone.querySelector('.message-text').textContent = msg.content;
-          if (msg.is_edited == 1) {
-            clone.querySelector('.message-date').textContent =
-              clone.querySelector('.message-date').textContent +
-              ' (исправоено)';
-          }
-          messageList.appendChild(clone);
-        });
-      })
-      .catch(err => {
-        console.error('Error:', err);
+      data.data.forEach(msg => {
+        const clone = document
+          .getElementById('message-template')
+          .content.cloneNode(true);
+        clone.querySelector('.message-card').dataset.id = msg.id;
+        clone.querySelector('.message-card').dataset.userId = msg.user_id;
+        clone.querySelector('.message-card').dataset.userRole = msg.role;
+        clone.querySelector('.message-date').textContent = msg.created_at;
+        clone.querySelector('.message-username').textContent =
+          msg.username + ':';
+        clone.querySelector('.message-role').textContent = msg.role;
+        clone.querySelector('.message-text').textContent = msg.content;
+        if (msg.is_edited == 1) {
+          clone.querySelector('.message-date').textContent += ' (исправлено)';
+        }
+        messageList.appendChild(clone);
       });
+    });
   }
 
   // Функция для обновления списка пользователей
   function fetchUsers() {
-    fetch('php/chat/getUsers.php')
-      .then(response => response.json())
-      .then(data => {
-        const userList = document.getElementById('user-list');
-        userList.innerHTML = ''; // Очищаем старый список
+    API.getUsers().then(data => {
+      const userList = document.getElementById('user-list');
+      userList.innerHTML = '';
 
-        data.data.forEach(user => {
-          const clone = document
-            .getElementById('user-template')
-            .content.cloneNode(true);
-          clone.querySelector('.user-card').dataset.id = user.id;
-          clone.querySelector('.user-card').dataset.role = user.role;
-          if (user.is_blocked == 1) {
-            clone.querySelector('.user-card').classList.add('block');
-          }
-          clone.querySelector('.user-name').textContent = user.username;
-          clone.querySelector('.user-role').textContent = user.role;
-          userList.appendChild(clone);
-        });
-      })
-      .catch(err => console.error('Error:', err));
+      data.data.forEach(user => {
+        const clone = document
+          .getElementById('user-template')
+          .content.cloneNode(true);
+        clone.querySelector('.user-card').dataset.id = user.id;
+        clone.querySelector('.user-card').dataset.role = user.role;
+        if (user.is_blocked == 1) {
+          clone.querySelector('.user-card').classList.add('block');
+        }
+        clone.querySelector('.user-name').textContent = user.username;
+        clone.querySelector('.user-role').textContent = user.role;
+        userList.appendChild(clone);
+      });
+    });
   }
 
   // Отправка сообщения
@@ -66,26 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMessage = document.getElementById('error-message');
     if (!messageText) return;
 
-    fetch('php/chat/sendMessage.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ content: messageText }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          fetchMessages();
-          e.target.reset();
-        } else {
-          alert(data.message || 'Error sending the message.');
-          errorMessage.textContent =
-            data.message || 'Error sending the message.';
-        }
-      })
-      .catch(err => {
-        console.error('Error:', err);
-        errorMessage.textContent = err.message || 'Error sending the message.';
-      });
+    API.sendMessage(messageText).then(data => {
+      if (data.success) {
+        fetchMessages();
+        e.target.reset();
+      } else {
+        errorMessage.textContent = data.message || 'Error sending the message.';
+      }
+    });
   });
 
   // ПКМ на сообщении
@@ -238,75 +218,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveButton = document.getElementById('save-message');
 
     // Подгрузить текст сообщения
-    fetch(`php/chat/getMessage.php?messageId=${messageId}`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          textarea.value = data.message.content;
-          modal.classList.remove('hidden');
-        } else {
-          alert('The message could not be uploaded.');
-        }
-      })
-      .catch(err => console.error('Error loading the message:', err));
+    API.getMessage(messageId).then(data => {
+      if (data.success) {
+        textarea.value = data.message.content;
+        modal.classList.remove('hidden');
+      }
+    });
 
     saveButton.onclick = () => {
-      fetch('php/chat/editMessage.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messageId, content: textarea.value }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert('The message has been edited.');
-            modal.classList.add('hidden');
-          } else {
-            alert('Error editing the message.');
-          }
-        })
-        .catch(err => console.error('Error:', err));
+      API.editMessage(messageId, textarea.value).then(data => {
+        if (data.success) {
+          alert('The message has been edited.');
+          modal.classList.add('hidden');
+        }
+      });
     };
   }
 
   function deleteMessage(messageId) {
     if (!confirm('Are you sure you want to delete this message?')) return;
 
-    fetch('php/chat/deleteMessage.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messageId }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert('The message has been deleted.');
-        } else {
-          alert('Error deleting the message.');
-        }
-      })
-      .catch(err => console.error('Error:', err));
+    API.deleteMessage(messageId).then(data => {
+      if (data.success) {
+        alert('The message has been deleted.');
+      }
+    });
   }
 
   function blockOrUnblockUser(userId) {
-    fetch(`php/chat/toggleBlockUser.php`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId }),
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert(
-            data.isBlocked
-              ? 'Error deleting the message.'
-              : 'The user is unblocked.',
-          );
-        } else {
-          alert('Error blocking the user.');
-        }
-      })
-      .catch(err => console.error('Error:', err));
+    API.toggleBlockUser(userId).then(data => {
+      if (data.success) {
+        alert(
+          data.isBlocked
+            ? 'Error deleting the message.'
+            : 'The user is unblocked.',
+        );
+      }
+    });
   }
 
   function showChangeRoleModal(userId) {
@@ -316,65 +264,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modal.classList.remove('hidden');
 
-    saveButton.onclick = () => {
-      fetch('php/chat/changeRole.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, newRole: select.value }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            alert('The role has been changed.');
-            modal.classList.add('hidden');
-          } else {
-            alert('Error changing the role.');
-          }
-        })
-        .catch(err => console.error('Error:', err));
+    changeUserRole.onclick = () => {
+      API.toggleBlockUser(userId, select.value).then(data => {
+        if (data.success) {
+          modal.classList.add('hidden');
+        }
+      });
     };
   }
 
   // Проверка авторизации пользователя
   function fetchUserInfo() {
-    fetch('php/chat/getUserInfo.php')
-      .then(response => response.json())
-      .then(data => {
-        const userInfo = document.getElementById('user-name-role');
-        const authButton = document.getElementById('auth-button');
-        const messageForm = document.getElementById('message-form');
-        const messageTextarea = messageForm.querySelector('textarea');
-        const messageSubmitButton = messageForm.querySelector(
-          'button[type="submit"]',
-        );
+    API.getUserInfo().then(data => {
+      const userInfo = document.getElementById('user-name-role');
+      const authButton = document.getElementById('auth-button');
+      const messageForm = document.getElementById('message-form');
+      const messageTextarea = messageForm.querySelector('textarea');
+      const messageSubmitButton = messageForm.querySelector(
+        'button[type="submit"]',
+      );
 
-        if (data.success) {
-          const user = data.data;
-          userInfo.textContent = `${user.username} (${user.role})`;
-          userInfo.dataset.id = user.id;
-          userInfo.dataset.role = user.role;
-          userInfo.dataset.is_blocked = user.is_blocked == 1;
-          userInfo.classList.remove('hidden');
-          authButton.classList.add('hidden');
+      if (data.success) {
+        const user = data.data;
+        userInfo.textContent = `${user.username} (${user.role})`;
+        userInfo.dataset.id = user.id;
+        userInfo.dataset.role = user.role;
+        userInfo.dataset.is_blocked = user.is_blocked == 1;
+        userInfo.classList.remove('hidden');
+        authButton.classList.add('hidden');
 
-          // Enable message form
-          messageTextarea.disabled = false;
-          messageSubmitButton.disabled = false;
-        } else {
-          userInfo.textContent = '';
-          userInfo.classList.add('hidden');
-          authButton.classList.remove('hidden');
-          authButton.textContent = 'Войти';
-          authButton.onclick = () => {
-            window.location.href = 'index.html';
-          };
+        // Enable message form
+        messageTextarea.disabled = false;
+        messageSubmitButton.disabled = false;
+      } else {
+        userInfo.textContent = '';
+        userInfo.classList.add('hidden');
+        authButton.classList.remove('hidden');
+        authButton.textContent = 'Войти';
+        authButton.onclick = () => {
+          window.location.href = 'index.html';
+        };
 
-          // Disable message form
-          messageTextarea.disabled = true;
-          messageSubmitButton.disabled = true;
-        }
-      })
-      .catch(err => console.error('Error:', err));
+        // Disable message form
+        messageTextarea.disabled = true;
+        messageSubmitButton.disabled = true;
+      }
+    });
   }
 
   // Автоматическое обновление сообщений и шапки
