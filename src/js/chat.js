@@ -13,17 +13,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const clone = document
           .getElementById('message-template')
           .content.cloneNode(true);
-        clone.querySelector('.message-card').dataset.id = msg.id;
-        clone.querySelector('.message-card').dataset.userId = msg.user_id;
-        clone.querySelector('.message-card').dataset.userRole = msg.role;
-        clone.querySelector('.message-date').textContent = msg.created_at;
-        clone.querySelector('.message-username').textContent =
+
+        const messageCard = clone.querySelector('.message-card');
+        messageCard.dataset.id = msg.id;
+        messageCard.querySelector('.message-date').textContent = msg.created_at;
+        messageCard.querySelector('.message-username').textContent =
           msg.username + ':';
-        clone.querySelector('.message-role').textContent = msg.role;
-        clone.querySelector('.message-text').textContent = msg.content;
+        messageCard.querySelector('.message-role').textContent = msg.role;
+        messageCard.querySelector('.message-text').textContent = msg.content;
         if (msg.is_edited == 1) {
-          clone.querySelector('.message-date').textContent += ' (исправлено)';
+          messageCard.querySelector('.message-date').textContent +=
+            ' (исправлено)';
         }
+
+        messageCard.dataset.id = msg.id;
+        messageCard.dataset.userId = msg.user_id;
+        messageCard.dataset.userRole = msg.role;
+        messageCard.dataset.is_blocked = msg.is_blocked == 1;
+
         messageList.appendChild(clone);
       });
     });
@@ -39,13 +46,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const clone = document
           .getElementById('user-template')
           .content.cloneNode(true);
-        clone.querySelector('.user-card').dataset.id = user.id;
-        clone.querySelector('.user-card').dataset.role = user.role;
+
+        const userCard = clone.querySelector('.user-card');
         if (user.is_blocked == 1) {
-          clone.querySelector('.user-card').classList.add('block');
+          userCard.classList.add('block');
         }
-        clone.querySelector('.user-name').textContent = user.username;
-        clone.querySelector('.user-role').textContent = user.role;
+        userCard.querySelector('.user-name').textContent = user.username;
+        userCard.querySelector('.user-role').textContent = user.role;
+
+        userCard.dataset.id = user.id;
+        userCard.dataset.role = user.role;
+        userCard.dataset.is_blocked = user.is_blocked == 1;
+
         userList.appendChild(clone);
       });
     });
@@ -63,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchMessages();
         e.target.reset();
       } else {
-        errorMessage.textContent = data.message || 'Error sending the message.';
+        errorMessage.textContent = 'Ошибка при отправке сообщения.';
       }
     });
   });
@@ -72,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('contextmenu', e => {
     const messageCard = e.target.closest('.message-card');
     const userCard = e.target.closest('.user-card');
-    const userInfo = document.getElementById('user-name-role');
+    const userInfo = document.getElementById('user-info');
 
     if (!messageCard && !userCard) return;
 
@@ -85,10 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const messageId = messageCard.dataset.id;
       const messageUserId = messageCard.dataset.userId;
       const messageUserRole = messageCard.dataset.userRole;
+      const messageBlocked = messageCard.dataset.is_blocked;
 
       showActionModal(
         'message',
-        { messageId, messageUserId, messageUserRole },
+        { messageId, messageUserId, messageUserRole, messageBlocked },
         currentUserRole,
         userId,
       );
@@ -97,10 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (userCard) {
       const targetUserId = userCard.dataset.id;
       const targetUserRole = userCard.dataset.role;
+      const is_blocked = userCard.dataset.is_blocked;
 
       showActionModal(
         'user',
-        { targetUserId, targetUserRole },
+        { targetUserId, targetUserRole, is_blocked },
         currentUserRole,
         userId,
       );
@@ -110,10 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function showActionModal(type, data, currentUserRole, currentUserId) {
     const modal = document.getElementById('action-modal');
     const buttonsContainer = document.getElementById('action-buttons');
-    buttonsContainer.innerHTML = ''; // Очистить старые кнопки
+    buttonsContainer.innerHTML = '';
 
     if (type === 'message') {
-      const { messageId, messageUserId, messageUserRole } = data;
+      const { messageId, messageUserId, messageUserRole, messageBlocked } =
+        data;
 
       // Редактировать (только автор)
       if (messageUserId === currentUserId) {
@@ -139,26 +154,29 @@ document.addEventListener('DOMContentLoaded', () => {
           (currentUserRole === 'admin' && messageUserRole !== 'admin')) &&
         messageUserId !== currentUserId
       ) {
-        addActionButton('Заблокировать/Разблокировать пользователя', () => {
-          blockOrUnblockUser(messageUserId);
-        });
+        addActionButton(
+          messageBlocked == 'true' ? 'Разблокировать' : 'Заблокировать',
+          () => {
+            blockOrUnblockUser(messageUserId);
+          },
+        );
       }
 
       // Изменить роль (администратор, если не администратор)
       if (currentUserRole === 'admin' && messageUserRole !== 'admin') {
         addActionButton('Изменить роль', () => {
-          showChangeRoleModal(messageUserId);
+          showChangeRoleModal(messageUserId, messageUserRole);
         });
       }
     }
 
     if (type === 'user') {
-      const { targetUserId, targetUserRole } = data;
+      const { targetUserId, targetUserRole, is_blocked } = data;
 
       // Изменить роль (администратор, если не администратор)
       if (currentUserRole === 'admin' && targetUserRole !== 'admin') {
         addActionButton('Изменить роль', () => {
-          showChangeRoleModal(targetUserId);
+          showChangeRoleModal(targetUserId, targetUserRole);
         });
       }
 
@@ -168,9 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
           (currentUserRole === 'admin' && targetUserRole !== 'admin')) &&
         targetUserId !== currentUserId
       ) {
-        addActionButton('Заблокировать пользователя', () => {
-          blockOrUnblockUser(targetUserId);
-        });
+        addActionButton(
+          is_blocked == 'true' ? 'Разблокировать' : 'Заблокировать',
+          () => {
+            blockOrUnblockUser(targetUserId);
+          },
+        );
       }
     }
 
@@ -193,90 +214,110 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('action-buttons').appendChild(button);
   }
 
-  function showEditMessageModal(messageId, messageCard) {
-    const modal = document.getElementById('edit-message-modal');
-    const textarea = document.getElementById('edit-message-text');
-    textarea.value = messageCard.querySelector('.message-content').textContent;
-
-    modal.classList.remove('hidden');
-
-    document.getElementById('save-message').onclick = () => {
-      // Реализация сохранения изменений сообщения
-      const newContent = textarea.value;
-      saveMessageChanges(messageId, newContent);
-      modal.classList.add('hidden');
-    };
-
-    document.getElementById('cancel-edit').onclick = () => {
-      modal.classList.add('hidden');
-    };
-  }
-
+  // Редактирование сообщения
   function showEditMessageModal(messageId) {
     const modal = document.getElementById('edit-message-modal');
     const textarea = document.getElementById('edit-message-text');
     const saveButton = document.getElementById('save-message');
+    const cancelButton = document.getElementById('cancel-edit');
+    let originalContent = ''; // Для хранения оригинального текста
 
     // Подгрузить текст сообщения
     API.getMessage(messageId).then(data => {
       if (data.success) {
-        textarea.value = data.message.content;
+        originalContent = data.data.content;
+        textarea.value = originalContent;
         modal.classList.remove('hidden');
+        saveButton.disabled = true; // Изначально кнопка "Сохранить" отключена
       }
     });
 
+    // Включать/отключать кнопку "Сохранить" при изменении текста
+    textarea.oninput = () => {
+      saveButton.disabled = textarea.value.trim() === originalContent;
+    };
+
+    // Сохранить изменения
     saveButton.onclick = () => {
       API.editMessage(messageId, textarea.value).then(data => {
         if (data.success) {
-          alert('The message has been edited.');
           modal.classList.add('hidden');
         }
       });
     };
+
+    // Закрыть модальное окно без сохранения
+    cancelButton.onclick = () => {
+      modal.classList.add('hidden');
+    };
   }
 
+  // Удаление сообщения
   function deleteMessage(messageId) {
-    if (!confirm('Are you sure you want to delete this message?')) return;
+    if (!confirm('Вы уверены, что хотите удалить это сообщение?')) return;
 
     API.deleteMessage(messageId).then(data => {
       if (data.success) {
-        alert('The message has been deleted.');
+        fetchMessages();
       }
     });
   }
 
+  // Блокировка пользователя
   function blockOrUnblockUser(userId) {
     API.toggleBlockUser(userId).then(data => {
       if (data.success) {
-        alert(
-          data.isBlocked
-            ? 'Error deleting the message.'
-            : 'The user is unblocked.',
-        );
+        fetchUsers();
+        fetchMessages();
       }
     });
   }
 
-  function showChangeRoleModal(userId) {
+  function showChangeRoleModal(userId, currentRole) {
     const modal = document.getElementById('change-role-modal');
     const select = document.getElementById('new-role');
     const saveButton = document.getElementById('save-role');
+    const cancelButton = document.getElementById('cancel-role');
 
+    // Устанавливаем текущую роль по умолчанию
+    select.value = currentRole;
+
+    // Отключаем кнопку "Сохранить" по умолчанию
+    saveButton.disabled = true;
+
+    // Показать модальное окно
     modal.classList.remove('hidden');
 
-    changeUserRole.onclick = () => {
-      API.toggleBlockUser(userId, select.value).then(data => {
-        if (data.success) {
-          modal.classList.add('hidden');
-        }
-      });
+    // Включаем кнопку "Сохранить" только при изменении роли
+    select.onchange = () => {
+      saveButton.disabled = select.value === currentRole;
+    };
+
+    // Обработчик для сохранения изменений
+    saveButton.onclick = () => {
+      const newRole = select.value;
+      if (newRole !== currentRole) {
+        API.changeUserRole(userId, newRole).then(data => {
+          if (data.success) {
+            modal.classList.add('hidden');
+            fetchMessages();
+            fetchUsers();
+          }
+        });
+      }
+    };
+
+    // Обработчик для закрытия модального окна без сохранения
+    cancelButton.onclick = () => {
+      modal.classList.add('hidden');
     };
   }
 
   // Проверка авторизации пользователя
   function fetchUserInfo() {
     API.getUserInfo().then(data => {
-      const userInfo = document.getElementById('user-name-role');
+      const userInfo = document.getElementById('user-info');
+      const userName = document.getElementById('user-name-role');
       const authButton = document.getElementById('auth-button');
       const messageForm = document.getElementById('message-form');
       const messageTextarea = messageForm.querySelector('textarea');
@@ -286,19 +327,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success) {
         const user = data.data;
-        userInfo.textContent = `${user.username} (${user.role})`;
+        userName.textContent = `${user.username} (${user.role})`;
+        userName.classList.remove('hidden');
+        authButton.classList.add('hidden');
+
         userInfo.dataset.id = user.id;
         userInfo.dataset.role = user.role;
         userInfo.dataset.is_blocked = user.is_blocked == 1;
-        userInfo.classList.remove('hidden');
-        authButton.classList.add('hidden');
 
         // Enable message form
         messageTextarea.disabled = false;
         messageSubmitButton.disabled = false;
       } else {
-        userInfo.textContent = '';
-        userInfo.classList.add('hidden');
+        userName.textContent = '';
+        userName.classList.add('hidden');
         authButton.classList.remove('hidden');
         authButton.textContent = 'Войти';
         authButton.onclick = () => {
