@@ -9,9 +9,9 @@ try {
         FROM users u
         JOIN roles r ON u.role_id = r.id
         ORDER BY 
-            u.is_blocked ASC,       -- Сначала пользователи без блокировки
+            u.is_blocked ASC,       
             FIELD(u.role_id, 3, 2, 1), -- Роли в порядке admin, moderator, user
-            u.username ASC          -- Сортировка по имени в алфавитном порядке
+            u.username ASC          
     ";
     $stmt = $db->query($query);
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
