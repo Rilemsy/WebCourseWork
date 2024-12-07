@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (data.success) {
         window.location.href = 'chat.html';
       } else {
-        errorMessage.textContent = data.message || 'Login failed.';
+        errorMessage.textContent = 'Ошибка входа.';
       }
     });
   });

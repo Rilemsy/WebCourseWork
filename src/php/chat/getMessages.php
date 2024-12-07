@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 try {
     $db = connectDB();
     $query = "
-        SELECT m.id, m.content, m.created_at, m.is_edited, m.user_id, u.username, r.name AS role
+        SELECT m.id, m.content, m.created_at, m.is_edited, m.user_id, u.username, u.is_blocked, r.name AS role
         FROM messages m
         JOIN users u ON m.user_id = u.id
         JOIN roles r ON u.role_id = r.id

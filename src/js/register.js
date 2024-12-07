@@ -32,15 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmPassword = confirmPasswordField.value.trim();
 
     if (password !== confirmPassword) {
-      errorMessage.textContent = 'Passwords do not match.';
+      errorMessage.textContent = 'Пароли не совпадают.';
       return;
     }
 
     API.register(username, password).then(data => {
-      if (parsedData.success) {
+      if (data.success) {
         window.location.href = 'chat.html';
       } else {
-        errorMessage.textContent = parsedData.message || 'Registration failed.';
+        errorMessage.textContent = 'Не удалось выполнить регистрацию.';
       }
     });
   });

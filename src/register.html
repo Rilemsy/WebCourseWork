@@ -1,31 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register</title>
+    <title>Зарегистрировать</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/form.css" />
   </head>
   <body>
     <div class="form">
-      <h1>Register</h1>
+      <h1>Зарегистрировать</h1>
       <form id="register-form" aria-label="Register Form" class="mb-4">
-        <label for="username" title="Enter your username" class="mb-1"
-          >Username:</label
+        <label for="username" title="Введите свое имя пользователя" class="mb-1"
+          >Имя пользователя:</label
         >
         <input
           type="text"
           id="username"
           name="username"
           required
-          placeholder="Enter your username"
-          title="Enter your username"
+          placeholder="Введите свое имя пользователя"
+          title="Введите свое имя пользователя"
           class="mb-3"
         />
 
-        <label for="password" title="Enter your password" class="mb-1"
-          >Password:</label
+        <label for="password" title="Введите свой пароль" class="mb-1"
+          >Пароль:</label
         >
         <div class="password-wrapper mb-3">
           <input
@@ -33,15 +33,15 @@
             id="password"
             name="password"
             required
-            placeholder="Enter your password"
-            title="Enter your password"
+            placeholder="Введите свой пароль"
+            title="Введите свой пароль"
           />
           <button type="button" id="toggle-password" class="toggle-password">
-            Show
+            Показать
           </button>
         </div>
 
-        <label for="confirm-password" title="Enter your password" class="mb-1"
+        <label for="confirm-password" title="Введите свой пароль" class="mb-1"
           >Сonfirm password:</label
         >
         <div class="password-wrapper mb-4">
@@ -50,25 +50,29 @@
             id="confirm-password"
             name="confirm-password"
             required
-            placeholder="Сonfirm your password"
-            title="Сonfirm your password"
+            placeholder="Подтвердите свой пароль"
+            title="Подтвердите свой пароль"
           />
           <button
             type="button"
             id="toggle-confirm-password"
             class="toggle-password"
           >
-            Show
+            Показать
           </button>
         </div>
 
         <span id="error-message" class="error-message mb-2"></span>
 
-        <button type="submit" title="Register your account">Register</button>
+        <button type="submit" title="Зарегистрируйте свою учетную запись">
+          Зарегистрировать
+        </button>
       </form>
-      <p>Already have an account? <a href="index.html">Login</a></p>
+      <p>
+        У вас уже есть учетная запись? <a href="index.html">Авторизоваться</a>
+      </p>
     </div>
 
-    <script src="js/register.js"></script>
+    <script type="module" src="js/register.js"></script>
   </body>
 </html>
