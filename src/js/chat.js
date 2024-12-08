@@ -39,10 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Функция для обновления списка сообщений
   function fetchMessages(flg = false) {
     const messageList = document.getElementById('message-list');
-
-    const isAtBottom =
-      messageList.scrollHeight - messageList.scrollTop <=
-      messageList.clientHeight + 1;
+    
     API.getMessages().then(data => {
       messageList.textContent = '';
 
@@ -75,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageList.appendChild(clone);
       });
 
-      if ((isAtBottom && initialLoad) || flg) {
+      if (initialLoad || flg) {
         messageList.scrollIntoView({ behavior: 'instant', block: 'end' });
         initialLoad = false;
       }

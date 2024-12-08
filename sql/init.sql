@@ -1,3 +1,6 @@
+CREATE SCHEMA `chat_application_new`;
+USE `chat_application_new`;
+
 CREATE TABLE roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(15) UNIQUE NOT NULL
@@ -20,7 +23,7 @@ CREATE TABLE users (
 CREATE TABLE messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    content TEXT NOT NULL,
+    content VARCHAR(4096) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_edited BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES users(id)
