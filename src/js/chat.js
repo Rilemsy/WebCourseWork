@@ -186,7 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Удалить (автор, модератор, администратор)
       if (
         messageUserId === currentUserId ||
         (currentUserRole === 'moderator' && messageUserRole === 'user') ||
@@ -197,7 +196,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Заблокировать пользователя (модератор, администратор)
       if (
         ((currentUserRole === 'moderator' && messageUserRole === 'user') ||
           (currentUserRole === 'admin' && messageUserRole !== 'admin')) &&
@@ -211,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
         );
       }
 
-      // Изменить роль (администратор, если не администратор)
       if (currentUserRole === 'admin' && messageUserRole !== 'admin') {
         addActionButton('Изменить роль', () => {
           showChangeRoleModal(messageUserId, messageUserRole);
@@ -222,14 +219,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (type === 'user') {
       const { targetUserId, targetUserRole, is_blocked } = data;
 
-      // Изменить роль (администратор, если не администратор)
       if (currentUserRole === 'admin' && targetUserRole !== 'admin') {
         addActionButton('Изменить роль', () => {
           showChangeRoleModal(targetUserId, targetUserRole);
         });
       }
 
-      // Заблокировать пользователя (модератор, администратор, если ниже рангом)
       if (
         ((currentUserRole === 'moderator' && targetUserRole === 'user') ||
           (currentUserRole === 'admin' && targetUserRole !== 'admin')) &&
@@ -269,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const textarea = document.getElementById('edit-message-text');
     const saveButton = document.getElementById('save-message');
     const cancelButton = document.getElementById('cancel-edit');
-    let originalContent = ''; // Для хранения оригинального текста
+    let originalContent = '';
 
     // Подгрузить текст сообщения
     API.getMessage(messageId).then(data => {
@@ -277,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         originalContent = data.data.content;
         textarea.value = originalContent;
         modal.classList.remove('hidden');
-        saveButton.disabled = true; // Изначально кнопка "Сохранить" отключена
+        saveButton.disabled = true;
       }
     });
 
@@ -286,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
       saveButton.disabled = textarea.value.trim() === originalContent;
     };
 
-    // Сохранить изменения
     saveButton.onclick = () => {
       API.editMessage(messageId, textarea.value).then(data => {
         if (data.success) {
@@ -302,7 +296,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Удаление сообщения
   function deleteMessage(messageId) {
     API.deleteMessage(messageId).then(data => {
       if (data.success) {
@@ -311,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Блокировка пользователя
   function blockOrUnblockUser(userId) {
     API.toggleBlockUser(userId).then(data => {
       if (data.success) {
@@ -330,7 +322,6 @@ document.addEventListener('DOMContentLoaded', () => {
     select.value = currentRole;
     saveButton.disabled = true;
 
-    // Показать модальное окно
     modal.classList.remove('hidden');
 
     select.onchange = () => {
@@ -351,7 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    // Обработчик для закрытия модального окна без сохранения
     cancelButton.onclick = () => {
       modal.classList.add('hidden');
     };
