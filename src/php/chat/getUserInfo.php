@@ -17,12 +17,6 @@ if (isset($_SESSION['user_id'])) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
-            // Проверка на блокировку пользователя
-            if ($user['is_blocked']) {
-                echo json_encode(['success' => false, 'message' => 'User is blocked']);
-                exit;
-            }
-
             echo json_encode([
                 'success' => true,
                 'data' => $user

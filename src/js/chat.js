@@ -37,9 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Функция для обновления списка сообщений
   function fetchMessages() {
+    const messageList = document.getElementById('message-list');
+    console.log(messageList.scrollHeight, " ", messageList.scrollTop, " ", messageList.clientHeight)
+
+    const isAtBottom =
+    messageList.scrollHeight - messageList.scrollTop <= messageList.clientHeight + 1;
     API.getMessages().then(data => {
-      const messageList = document.getElementById('message-list');
-      messageList.innerHTML = '';
+      //const messageList = document.getElementById('message-list');
+      messageList.textContent = '';
 
       data.data.forEach(msg => {
         const clone = document
@@ -59,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageCard.querySelector('.message-text').textContent = msg.content;
         if (msg.is_edited == 1) {
           messageCard.querySelector('.message-date').textContent +=
-            ' (исправлено)';
+            ' (отредактировано)';
         }
 
         messageCard.dataset.id = msg.id;
@@ -69,6 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         messageList.appendChild(clone);
       });
+      //const isAtBottom = Math.abs(messageList.scrollHeight - messageList.scrollTop - messageList.clientHeight) < 1
+      if (isAtBottom) {
+        console.log("Scroll")
+        //messageList.scrollTop = messageList.scrollHeight;
+        messageList.scrollIntoView({ behavior: "instant", block: "end" });
+      }
     });
   }
 
@@ -293,8 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Удаление сообщения
   function deleteMessage(messageId) {
-    if (!confirm('Вы уверены, что хотите удалить это сообщение?')) return;
-
     API.deleteMessage(messageId).then(data => {
       if (data.success) {
         fetchMessages();
@@ -318,16 +327,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveButton = document.getElementById('save-role');
     const cancelButton = document.getElementById('cancel-role');
 
-    // Устанавливаем текущую роль по умолчанию
     select.value = currentRole;
-
-    // Отключаем кнопку "Сохранить" по умолчанию
     saveButton.disabled = true;
 
     // Показать модальное окно
     modal.classList.remove('hidden');
 
-    // Включаем кнопку "Сохранить" только при изменении роли
     select.onchange = () => {
       saveButton.disabled = select.value === currentRole;
     };
@@ -374,8 +379,8 @@ document.addEventListener('DOMContentLoaded', () => {
         userInfo.dataset.role = user.role;
         userInfo.dataset.is_blocked = user.is_blocked == 1;
 
-        messageTextarea.disabled = false;
-        messageSubmitButton.disabled = false;
+        messageTextarea.disabled = user.is_blocked == 1;
+        messageSubmitButton.disabled = user.is_blocked == 1;
       } else {
         userName.textContent = '';
         userName.classList.add('hidden');
@@ -391,14 +396,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Автоматическое обновление сообщений и шапки
   setInterval(() => {
     fetchUserInfo();
     fetchMessages();
     fetchUsers();
   }, timeUpdate);
 
-  // Начальная загрузка данных
   fetchUserInfo();
   fetchMessages();
   fetchUsers();

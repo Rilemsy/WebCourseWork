@@ -18,7 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         $db = connectDB();
-        $stmt = $db->prepare("INSERT INTO messages (user_id, content) VALUES (:user_id, :content)");
+        $stmt = $db->prepare("INSERT INTO messages (user_id, content, created_at)
+            SELECT :user_id, :content, NOW() FROM users
+            WHERE id = :user_id AND is_blocked = false;
+");
         $stmt->execute(['user_id' => $_SESSION['user_id'], 'content' => $content]);
 
         echo json_encode(['success' => true, 'message' => 'Message sent successfully']);
