@@ -2,6 +2,7 @@ import API from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const timeUpdate = 5 * 1000;
+  let initialLoad = true;
 
   function translateRole(role) {
     const roles = {
@@ -36,10 +37,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Функция для обновления списка сообщений
-  function fetchMessages() {
+  function fetchMessages(flg = false) {
+    const messageList = document.getElementById('message-list');
+
+    const isAtBottom =
+    messageList.scrollHeight - messageList.scrollTop <= messageList.clientHeight + 1;
     API.getMessages().then(data => {
-      const messageList = document.getElementById('message-list');
-      messageList.innerHTML = '';
+      messageList.textContent = '';
 
       data.data.forEach(msg => {
         const clone = document
@@ -59,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         messageCard.querySelector('.message-text').textContent = msg.content;
         if (msg.is_edited == 1) {
           messageCard.querySelector('.message-date').textContent +=
-            ' (исправлено)';
+            ' (отредактировано)';
         }
 
         messageCard.dataset.id = msg.id;
@@ -69,6 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         messageList.appendChild(clone);
       });
+
+      if ((isAtBottom && initialLoad) || flg) {
+        messageList.scrollIntoView({ behavior: "instant", block: "end" });
+        initialLoad = false;
+      }
     });
   }
 
@@ -110,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     API.sendMessage(messageText).then(data => {
       if (data.success) {
-        fetchMessages();
+        fetchMessages(true);
         e.target.reset();
       } else {
         errorMessage.textContent = 'Ошибка при отправке сообщения.';
@@ -175,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Удалить (автор, модератор, администратор)
       if (
         messageUserId === currentUserId ||
         (currentUserRole === 'moderator' && messageUserRole === 'user') ||
@@ -186,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
-      // Заблокировать пользователя (модератор, администратор)
       if (
         ((currentUserRole === 'moderator' && messageUserRole === 'user') ||
           (currentUserRole === 'admin' && messageUserRole !== 'admin')) &&
@@ -200,7 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
         );
       }
 
-      // Изменить роль (администратор, если не администратор)
       if (currentUserRole === 'admin' && messageUserRole !== 'admin') {
         addActionButton('Изменить роль', () => {
           showChangeRoleModal(messageUserId, messageUserRole);
@@ -211,14 +217,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (type === 'user') {
       const { targetUserId, targetUserRole, is_blocked } = data;
 
-      // Изменить роль (администратор, если не администратор)
       if (currentUserRole === 'admin' && targetUserRole !== 'admin') {
         addActionButton('Изменить роль', () => {
           showChangeRoleModal(targetUserId, targetUserRole);
         });
       }
 
-      // Заблокировать пользователя (модератор, администратор, если ниже рангом)
       if (
         ((currentUserRole === 'moderator' && targetUserRole === 'user') ||
           (currentUserRole === 'admin' && targetUserRole !== 'admin')) &&
@@ -258,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const textarea = document.getElementById('edit-message-text');
     const saveButton = document.getElementById('save-message');
     const cancelButton = document.getElementById('cancel-edit');
-    let originalContent = ''; // Для хранения оригинального текста
+    let originalContent = '';
 
     // Подгрузить текст сообщения
     API.getMessage(messageId).then(data => {
@@ -266,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         originalContent = data.data.content;
         textarea.value = originalContent;
         modal.classList.remove('hidden');
-        saveButton.disabled = true; // Изначально кнопка "Сохранить" отключена
+        saveButton.disabled = true;
       }
     });
 
@@ -275,7 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
       saveButton.disabled = textarea.value.trim() === originalContent;
     };
 
-    // Сохранить изменения
     saveButton.onclick = () => {
       API.editMessage(messageId, textarea.value).then(data => {
         if (data.success) {
@@ -291,10 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Удаление сообщения
   function deleteMessage(messageId) {
-    if (!confirm('Вы уверены, что хотите удалить это сообщение?')) return;
-
     API.deleteMessage(messageId).then(data => {
       if (data.success) {
         fetchMessages();
@@ -302,7 +302,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Блокировка пользователя
   function blockOrUnblockUser(userId) {
     API.toggleBlockUser(userId).then(data => {
       if (data.success) {
@@ -318,16 +317,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveButton = document.getElementById('save-role');
     const cancelButton = document.getElementById('cancel-role');
 
-    // Устанавливаем текущую роль по умолчанию
     select.value = currentRole;
-
-    // Отключаем кнопку "Сохранить" по умолчанию
     saveButton.disabled = true;
 
-    // Показать модальное окно
     modal.classList.remove('hidden');
 
-    // Включаем кнопку "Сохранить" только при изменении роли
     select.onchange = () => {
       saveButton.disabled = select.value === currentRole;
     };
@@ -346,7 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
 
-    // Обработчик для закрытия модального окна без сохранения
     cancelButton.onclick = () => {
       modal.classList.add('hidden');
     };
@@ -366,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success) {
         const user = data.data;
-        userName.textContent = `${user.username} (${user.role})`;
+        userName.textContent = `${user.username} (${translateRole(user.role)})`;
         userName.classList.remove('hidden');
         authButton.classList.add('hidden');
 
@@ -374,9 +367,8 @@ document.addEventListener('DOMContentLoaded', () => {
         userInfo.dataset.role = user.role;
         userInfo.dataset.is_blocked = user.is_blocked == 1;
 
-        // Enable message form
-        messageTextarea.disabled = false;
-        messageSubmitButton.disabled = false;
+        messageTextarea.disabled = user.is_blocked == 1;
+        messageSubmitButton.disabled = user.is_blocked == 1;
       } else {
         userName.textContent = '';
         userName.classList.add('hidden');
@@ -386,21 +378,18 @@ document.addEventListener('DOMContentLoaded', () => {
           window.location.href = 'index.html';
         };
 
-        // Disable message form
         messageTextarea.disabled = true;
         messageSubmitButton.disabled = true;
       }
     });
   }
 
-  // Автоматическое обновление сообщений и шапки
   setInterval(() => {
     fetchUserInfo();
     fetchMessages();
     fetchUsers();
   }, timeUpdate);
 
-  // Начальная загрузка данных
   fetchUserInfo();
   fetchMessages();
   fetchUsers();

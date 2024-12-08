@@ -3,30 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Зарегистрировать</title>
+    <title>Регистрация</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/form.css" />
   </head>
   <body>
     <div class="form">
-      <h1>Зарегистрировать</h1>
+      <h1>Регистрация</h1>
       <form id="register-form" aria-label="Register Form" class="mb-4">
-        <label for="username" title="Введите свое имя пользователя" class="mb-1"
-          >Имя пользователя:</label
-        >
+        <label for="username" class="mb-1"
+          >Имя пользователя:</label>
         <input
           type="text"
           id="username"
           name="username"
           required
-          placeholder="Введите свое имя пользователя"
-          title="Введите свое имя пользователя"
+          placeholder="Введите свое имя"
+          title="Введите свое имя"
           class="mb-3"
         />
 
-        <label for="password" title="Введите свой пароль" class="mb-1"
-          >Пароль:</label
-        >
+        <label for="password" class="mb-1"
+          >Пароль:</label>
         <div class="password-wrapper mb-3">
           <input
             type="password"
@@ -41,9 +39,8 @@
           </button>
         </div>
 
-        <label for="confirm-password" title="Введите свой пароль" class="mb-1"
-          >Сonfirm password:</label
-        >
+        <label for="confirm-password" class="mb-1"
+          >Подтверждение пароля:</label>
         <div class="password-wrapper mb-4">
           <input
             type="password"
@@ -65,7 +62,7 @@
         <span id="error-message" class="error-message mb-2"></span>
 
         <button type="submit" title="Зарегистрируйте свою учетную запись">
-          Зарегистрировать
+          Зарегистрироваться
         </button>
       </form>
       <p>
