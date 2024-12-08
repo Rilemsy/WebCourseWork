@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const messageList = document.getElementById('message-list');
 
     const isAtBottom =
-    messageList.scrollHeight - messageList.scrollTop <= messageList.clientHeight + 1;
+      messageList.scrollHeight - messageList.scrollTop <=
+      messageList.clientHeight + 1;
     API.getMessages().then(data => {
       messageList.textContent = '';
 
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if ((isAtBottom && initialLoad) || flg) {
-        messageList.scrollIntoView({ behavior: "instant", block: "end" });
+        messageList.scrollIntoView({ behavior: 'instant', block: 'end' });
         initialLoad = false;
       }
     });
@@ -349,7 +350,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function fetchUserInfo() {
     API.getUserInfo().then(data => {
       const userInfo = document.getElementById('user-info');
-      const userName = document.getElementById('user-name-role');
+      const userName = document.getElementById('user-name');
+      const userRole = document.getElementById('user-role');
       const authButton = document.getElementById('auth-button');
       const messageForm = document.getElementById('message-form');
       const messageTextarea = messageForm.querySelector('textarea');
@@ -359,8 +361,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.success) {
         const user = data.data;
-        userName.textContent = `${user.username} (${translateRole(user.role)})`;
+        userName.textContent = user.username;
+        userRole.textContent = `(${translateRole(user.role)})`;
         userName.classList.remove('hidden');
+        userRole.classList.remove('hidden');
         authButton.classList.add('hidden');
 
         userInfo.dataset.id = user.id;
@@ -371,7 +375,9 @@ document.addEventListener('DOMContentLoaded', () => {
         messageSubmitButton.disabled = user.is_blocked == 1;
       } else {
         userName.textContent = '';
+        userRole.textContent = '';
         userName.classList.add('hidden');
+        userRole.classList.add('hidden');
         authButton.classList.remove('hidden');
         authButton.textContent = 'Войти';
         authButton.onclick = () => {
