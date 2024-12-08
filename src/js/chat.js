@@ -2,6 +2,7 @@ import API from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const timeUpdate = 5 * 1000;
+  let initialLoad = true;
 
   function translateRole(role) {
     const roles = {
@@ -36,14 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Функция для обновления списка сообщений
-  function fetchMessages() {
+  function fetchMessages(flg = false) {
     const messageList = document.getElementById('message-list');
-    console.log(messageList.scrollHeight, " ", messageList.scrollTop, " ", messageList.clientHeight)
 
     const isAtBottom =
     messageList.scrollHeight - messageList.scrollTop <= messageList.clientHeight + 1;
     API.getMessages().then(data => {
-      //const messageList = document.getElementById('message-list');
       messageList.textContent = '';
 
       data.data.forEach(msg => {
@@ -74,11 +73,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         messageList.appendChild(clone);
       });
-      //const isAtBottom = Math.abs(messageList.scrollHeight - messageList.scrollTop - messageList.clientHeight) < 1
-      if (isAtBottom) {
-        console.log("Scroll")
-        //messageList.scrollTop = messageList.scrollHeight;
+
+      if ((isAtBottom && initialLoad) || flg) {
         messageList.scrollIntoView({ behavior: "instant", block: "end" });
+        initialLoad = false;
       }
     });
   }
@@ -121,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     API.sendMessage(messageText).then(data => {
       if (data.success) {
-        fetchMessages();
+        fetchMessages(true);
         e.target.reset();
       } else {
         errorMessage.textContent = 'Ошибка при отправке сообщения.';
