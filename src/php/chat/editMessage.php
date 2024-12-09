@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once '../db.php';
 
 $data = json_decode(file_get_contents('php://input'), true);
@@ -9,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($data['messageId'], $data['co
 
     try {
         $db = connectDB();
-        $stmt = $db->prepare("UPDATE messages SET content = :content, is_edited = TRUE WHERE id = :messageId");
-        $stmt->execute(['content' => $content, 'messageId' => $messageId]);
+        $stmt = $db->prepare("UPDATE messages SET content = :content, is_edited = TRUE WHERE id = :messageId AND user_id = :curUserId");
+        $stmt->execute(['content' => $content, 'messageId' => $messageId, 'curUserId' => $_SESSION['user_id']]);
 
         echo json_encode(['success' => true]);
     } catch (Exception $e) {

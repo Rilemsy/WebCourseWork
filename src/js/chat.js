@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const date = new Date(isoString);
 
     // Временная зона пользователя (в минутах)
-    const userTimezoneOffset = date.getTimezoneOffset(); // От UTC в минутах
-    const localDate = new Date(date.getTime() - userTimezoneOffset * 60000); // Корректируем время
+    const userTimezoneOffset = date.getTimezoneOffset();
+    const localDate = new Date(date.getTime() - userTimezoneOffset * 60000); 
 
     // Форматирование: DD.MM.YYYY HH:mm
     const formattedDate = localDate.toLocaleDateString('ru-RU', {
