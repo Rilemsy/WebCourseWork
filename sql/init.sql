@@ -1,5 +1,5 @@
-CREATE SCHEMA `chat_application_new`;
-USE `chat_application_new`;
+CREATE SCHEMA `chat_application`;
+USE `chat_application`;
 
 CREATE TABLE roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,10 +30,10 @@ CREATE TABLE messages (
 );
 
 INSERT INTO users (username, password_hash, role_id, is_blocked) VALUES
-('user1', '$2y$10$eImiTXuWVxfM37uY4JANjQWv.Pw5J5QuZM7f0/6FGEQRuCwA.KK2.', 1, FALSE), -- Пароль: password1
-('mod1', '$2y$10$eImiTXuWVxfM37uY4JANjQWv.Pw5J5QuZM7f0/6FGEQRuCwA.KK2.', 2, FALSE), -- Пароль: password1
-('admin1', '$2y$10$eImiTXuWVxfM37uY4JANjQWv.Pw5J5QuZM7f0/6FGEQRuCwA.KK2.', 3, FALSE), -- Пароль: password1
-('blocked_user', '$2y$10$eImiTXuWVxfM37uY4JANjQWv.Pw5J5QuZM7f0/6FGEQRuCwA.KK2.', 1, TRUE); -- Заблокированный пользователь
+('user1', '$2y$10$H1lX/ENcgjBQnpZUxF43ue4EkEMv8M0Eib.0u2f3Xt74Toju4w9Jm', 1, FALSE), -- Пароль: password1
+('mod1', '$2y$10$H1lX/ENcgjBQnpZUxF43ue4EkEMv8M0Eib.0u2f3Xt74Toju4w9Jm', 2, FALSE), -- Пароль: password1
+('admin1', '$2y$10$H1lX/ENcgjBQnpZUxF43ue4EkEMv8M0Eib.0u2f3Xt74Toju4w9Jm', 3, FALSE), -- Пароль: password1
+('blocked_user', '$2y$10$H1lX/ENcgjBQnpZUxF43ue4EkEMv8M0Eib.0u2f3Xt74Toju4w9Jm', 1, TRUE); -- Заблокированный пользователь
 
 INSERT INTO messages (user_id, content, is_edited) VALUES
 (1, 'Привет! Это сообщение от пользователя user1.', FALSE),

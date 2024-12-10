@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function togglePasswordVisibility(inputField, toggleButton) {
     const isPasswordVisible = inputField.type === 'text';
     inputField.type = isPasswordVisible ? 'password' : 'text';
-    toggleButton.textContent = isPasswordVisible ? 'Show' : 'Hide';
+    toggleButton.textContent = isPasswordVisible ? 'Показать' : 'Скрыть';
   }
 
   togglePassword.addEventListener('click', () => {
